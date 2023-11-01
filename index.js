@@ -2,6 +2,7 @@ import admin from 'firebase-admin'
 import serviceAccountKey from './serviceAccountKey.js'
 import fs from 'fs'
 import { getAnnouncements } from './fetchers/announcements.js';
+import cron from 'node-cron'
 
 const app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccountKey)
@@ -9,20 +10,9 @@ const app = admin.initializeApp({
 
 const announcementCachePath = "cache/announcement-cache.json"
 
-console.log("RYW Latest Notifier")
-console.log(app)
+console.log("RYW Latest Notifier Service")
 
 const messaging = admin.messaging()
-
-/*
-messaging.send({
-    notification: {
-        title: "Test",
-        body: "Test RYW"
-    },
-    topic: "all"
-})
-*/
 
 const fetchAnnouncements = async () => {
     let cacheTitles = JSON.parse(fs.readFileSync(announcementCachePath, "utf-8"))
@@ -63,12 +53,11 @@ const fetchAnnouncements = async () => {
 }
 
 async function mainLoop() {
+    console.log("Fetching")
     await fetchAnnouncements()
-    setTimeout(() => {
-        mainLoop()
-    }, 2000);
 }
 
+cron.schedule("*/15 6-18 * * *", mainLoop)
 mainLoop()
 
 process.on("uncaughtException", (e) => {console.log(e)})
