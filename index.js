@@ -55,6 +55,7 @@ const fetchAnnouncements = async () => {
 async function mainLoop() {
     console.log("Fetching")
     await fetchAnnouncements()
+    console.log("Checkup Completed")
 }
 
 cron.schedule("*/15 6-18 * * *", mainLoop)
