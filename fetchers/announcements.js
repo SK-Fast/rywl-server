@@ -27,3 +27,18 @@ export async function getAnnouncements() {
 
   return result
 }
+
+export async function getBanners() {
+  const res = await axios.get(homeURL)
+
+  const doc = new JSDOM(res.data)
+  const dom = doc.window.document
+
+  const result = []
+
+  for (const element of dom.querySelectorAll(".fitvidsignore")[1].querySelectorAll(".n2-ss-slide-background-image img.skip-lazy")) {
+    result.push(element.getAttribute("src"))
+  }
+
+  return result
+}

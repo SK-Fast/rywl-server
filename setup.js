@@ -1,3 +1,4 @@
 import fs from 'fs'
-fs.mkdirSync("cache")
-fs.writeFileSync("cache/announcement-cache.json", "[]")
+try { fs.mkdirSync("cache") } catch{}
+try { fs.writeFileSync("cache/announcement-cache.json", "[]") } catch{}
+try { fs.writeFileSync("cache/banners-cache.json", "[]") } catch{}

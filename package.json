@@ -2,8 +2,11 @@
   "type": "module",
   "dependencies": {
     "axios": "^1.6.0",
+    "canvas": "^2.11.2",
+    "dotenv": "^16.3.1",
     "expressjs": "^1.0.1",
     "firebase-admin": "^11.11.0",
+    "instagram-private-api": "^1.45.3",
     "jsdom": "^22.1.0",
     "node-cron": "^3.0.2",
     "string-strip-html": "^13.4.3"
