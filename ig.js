@@ -4,27 +4,23 @@ import fs from 'fs'
 
 config()
 
-const ig = new IgApiClient();
-// You must generate device id's before login.
-// Id's generated based on seed
-// So if you pass the same value as first argument - the same id's are generated every time
-ig.state.generateDevice(process.env.IG_USERNAME);
-// Optionally you can setup proxy url
-ig.state.proxyUrl = process.env.IG_PROXY;
-(async () => {
-    const testImg = fs.readFileSync("./g_3.jpg")
+const ig = new IgApiClient()
+ig.state.generateDevice(process.env.IG_USERNAME)
 
-    await ig.simulate.preLoginFlow();
-    const loggedInUser = await ig.account.login(process.env.IG_USERNAME, process.env.IG_PASSWORD);
+ig.state.proxyUrl = process.env.IG_PROXY
 
-    process.nextTick(async () => await ig.simulate.postLoginFlow());
+export async function init() {
+    await ig.simulate.preLoginFlow()
+    const loggedInUser = await ig.account.login(process.env.IG_USERNAME, process.env.IG_PASSWORD)
 
     console.log("Logged in as ", loggedInUser.username)
+}
 
+export async function postImg(buffer, caption) {
     await ig.publish.photo({
-        file: testImg,
-        caption: "ทดสอบ"
+        file: buffer,
+        caption: caption
     })
 
-    console.log("Posted")
-})();
+    console.log("IG Posted")
+}

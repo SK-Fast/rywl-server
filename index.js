@@ -1,14 +1,17 @@
 import admin from 'firebase-admin'
 import serviceAccountKey from './serviceAccountKey.js'
 import fs from 'fs'
-import { getAnnouncements } from './fetchers/announcements.js';
+import { getAnnouncements, getBanners } from './fetchers/announcements.js';
 import cron from 'node-cron'
+import * as IG from './ig.js'
+import axios from "axios"
 
 const app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccountKey)
 });
 
 const announcementCachePath = "cache/announcement-cache.json"
+const bannerCachePath = "cache/banners-cache.json"
 
 console.log("RYW Latest Notifier Service")
 
@@ -52,13 +55,54 @@ const fetchAnnouncements = async () => {
     fs.writeFileSync(announcementCachePath, JSON.stringify(cacheTitles))
 }
 
+const fetchBanners = async () => {
+    let cacheTitles = JSON.parse(fs.readFileSync(bannerCachePath, "utf-8"))
+    const banners = await getBanners()
+
+    if (cacheTitles.length == 0) {
+        cacheTitles = banners
+    } else {
+        const newBanners = []
+
+        for (const a of banners) {
+            if (cacheTitles.includes(a) == false) {
+                newBanners.push(a)
+            }
+        }
+
+        for (const newA of newBanners) {
+            const buf = await axios.get(newA, {
+                responseType: "arraybuffer"
+            })
+            const buffer = Buffer.from(buf.data, 'base64');
+
+            IG.postImg(buffer, "📢 ประกาศภาพใหม่บนหน้าเว็บ https://rayongwit.ac.th/")
+
+            cacheTitles.push(newA)
+        }
+    }
+
+    fs.writeFileSync(bannerCachePath, JSON.stringify(cacheTitles))
+}
+
 async function mainLoop() {
     console.log("Fetching")
     await fetchAnnouncements()
+    await fetchBanners()
     console.log("Checkup Completed")
 }
 
-cron.schedule("*/15 6-18 * * *", mainLoop)
-mainLoop()
+cron.schedule("*/15 5-22 * * *", mainLoop)
+async function main() {
+    await IG.init()
+    mainLoop()
+    /*
+    setInterval(() => {
+        mainLoop()
+    }, 5000)
+    */
+}
+
+main()
 
 process.on("uncaughtException", (e) => {console.log(e)})
