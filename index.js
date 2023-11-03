@@ -92,7 +92,7 @@ async function mainLoop() {
     console.log("Checkup Completed")
 }
 
-cron.schedule("*/15 5-22 * * *", mainLoop)
+cron.schedule("*/5 5-22 * * *", mainLoop)
 async function main() {
     await IG.init()
     mainLoop()
