@@ -1,17 +1,12 @@
 import { IgApiClient } from 'instagram-private-api';
-import { config } from 'dotenv';
-import fs from 'fs'
-
-config()
+import config from './config.js'
 
 const ig = new IgApiClient()
-ig.state.generateDevice(process.env.IG_USERNAME)
-
-ig.state.proxyUrl = process.env.IG_PROXY
+ig.state.generateDevice(config.IG_USERNAME)
 
 export async function init() {
     await ig.simulate.preLoginFlow()
-    const loggedInUser = await ig.account.login(process.env.IG_USERNAME, process.env.IG_PASSWORD)
+    const loggedInUser = await ig.account.login(config.IG_USERNAME, config.IG_PASSWORD)
 
     console.log("Logged in as ", loggedInUser.username)
 }

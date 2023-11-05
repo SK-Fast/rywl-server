@@ -2,3 +2,4 @@ node_modules
 serviceAccountKey.js
 cache
 .env
+config.js
