@@ -5,6 +5,7 @@ import { JSDOM } from 'jsdom';
 
 const url = "https://rayongwit.ac.th/%E0%B8%82%E0%B9%88%E0%B8%B2%E0%B8%A7%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%8A%E0%B8%B2%E0%B8%AA%E0%B8%B1%E0%B8%A1%E0%B8%9E%E0%B8%B1%E0%B8%99%E0%B8%98%E0%B9%8C/"
 const homeURL = "https://rayongwit.ac.th/home/"
+const landingURL = "https://rayongwit.ac.th/"
 
 export async function getAnnouncements() {
   const res = await axios.get(url)
@@ -31,14 +32,14 @@ export async function getAnnouncements() {
 }
 
 export async function getBanners() {
-  const res = await axios.get(homeURL)
+  const res = await axios.get(landingURL)
 
   const doc = new JSDOM(res.data)
   const dom = doc.window.document
 
   const result = []
 
-  for (const element of dom.querySelectorAll(".fitvidsignore")[1].querySelectorAll(".n2-ss-slide-background-image img.skip-lazy")) {
+  for (const element of dom.querySelector(".fitvidsignore").querySelectorAll(".n2-ss-slide-background-image img.skip-lazy")) {
     result.push("https:" + element.getAttribute("src"))
   }
 
