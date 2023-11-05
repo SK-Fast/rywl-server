@@ -6,13 +6,14 @@ import cron from 'node-cron'
 import * as IG from './ig.js'
 import axios from "axios"
 import * as Blynk from './blynk.js'
+import path from 'path'
 
 const app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccountKey)
 });
 
-const announcementCachePath = "cache/announcement-cache.json"
-const bannerCachePath = "cache/banners-cache.json"
+const announcementCachePath = path.resolve(__dirname, "cache/announcement-cache.json")
+const bannerCachePath = path.resolve(__dirname, "cache/banners-cache.json")
 
 console.log("RYW Latest Notifier Service")
 
