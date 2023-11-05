@@ -7,10 +7,16 @@ import * as IG from './ig.js'
 import axios from "axios"
 import * as Blynk from './blynk.js'
 import path from 'path'
+import {fileURLToPath} from 'url';
 
 const app = admin.initializeApp({
     credential: admin.credential.cert(serviceAccountKey)
 });
+
+const __filename = fileURLToPath(import.meta.url);
+console.log(__filename)
+
+const __dirname = path.dirname(__filename);
 
 const announcementCachePath = path.resolve(__dirname, "cache/announcement-cache.json")
 const bannerCachePath = path.resolve(__dirname, "cache/banners-cache.json")
