@@ -14,14 +14,11 @@ const app = admin.initializeApp({
 });
 
 const __filename = fileURLToPath(import.meta.url);
-console.log(__filename)
 
 const __dirname = path.dirname(__filename);
 
 const announcementCachePath = path.resolve(__dirname, "cache/announcement-cache.json")
 const bannerCachePath = path.resolve(__dirname, "cache/banners-cache.json")
-
-console.log("RYW Latest Notifier Service")
 
 const dtFormat = new Intl.DateTimeFormat('en',
     {
@@ -34,6 +31,8 @@ const dtFormat = new Intl.DateTimeFormat('en',
     })
 
 const messaging = admin.messaging()
+
+Blynk.writeConsole(`RYW Latest Ready at ${dtFormat.format(new Date())}`)
 
 const fetchAnnouncements = async () => {
     let cacheTitles = JSON.parse(fs.readFileSync(announcementCachePath, "utf-8"))
@@ -48,14 +47,16 @@ const fetchAnnouncements = async () => {
 
         for (const a of announcements) {
             if (cacheTitles.includes(a.title) == false) {
+                Blynk.writeConsole(`New article detected ${a.title}`)
+
                 newArticles.push(a)
             }
         }
 
-        if ((await Blynk.getData("V2")) == "1") {
+        if ((await Blynk.getData("V2")) == 1) {
             for (const newA of newArticles) {
                 try {
-                    console.log("FORWADING ", newA.title)
+                    Blynk.writeConsole(`Forwarding Article ${newA.title}`)
                     await messaging.send({
                         notification: {
                             title: "ข่าวประชาสัมพันธ์ใหม่",
@@ -86,44 +87,41 @@ const fetchBanners = async () => {
 
         for (const a of banners) {
             if (cacheTitles.includes(a) == false) {
+                Blynk.writeConsole(`New banner detected ${a}`)
                 newBanners.push(a)
             }
         }
 
-        if ((await Blynk.getData("V1")) == "1") {
+        const igEnabled = await Blynk.getData("V1")
+
+        if (igEnabled == 1) {
             for (const newA of newBanners) {
                 const buf = await axios.get(newA, {
                     responseType: "arraybuffer"
                 })
                 const buffer = Buffer.from(buf.data, 'base64');
 
-                IG.postImg(buffer, "📢 ประกาศภาพใหม่บนหน้าเว็บ https://rayongwit.ac.th/")
+                await IG.postImg(buffer, "📢 ประกาศภาพใหม่บนหน้าเว็บ https://rayongwit.ac.th/")
+
+                Blynk.writeConsole("Wrote to IG")
 
                 cacheTitles.push(newA)
+                fs.writeFileSync(bannerCachePath, JSON.stringify(cacheTitles))
             }
         }
     }
-
-    fs.writeFileSync(bannerCachePath, JSON.stringify(cacheTitles))
 }
 
 async function mainLoop() {
-    console.log("Fetching")
     await fetchAnnouncements()
     await fetchBanners()
     Blynk.updateData("V0", dtFormat.format(new Date()))
-    console.log("Checkup Completed")
 }
 
 cron.schedule("*/5 5-22 * * *", mainLoop)
 async function main() {
     await IG.init()
     mainLoop()
-    /*
-    setInterval(() => {
-        mainLoop()
-    }, 5000)
-    */
 }
 
 setTimeout(() => {

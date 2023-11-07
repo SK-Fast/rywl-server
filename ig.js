@@ -1,10 +1,13 @@
 import { IgApiClient } from 'instagram-private-api';
 import config from './config.js'
 
-const ig = new IgApiClient()
-ig.state.generateDevice(config.IG_USERNAME)
+
+let ig;
 
 export async function init() {
+    const ig = new IgApiClient()
+    ig.state.generateDevice(config.IG_USERNAME)
+
     await ig.simulate.preLoginFlow()
     const loggedInUser = await ig.account.login(config.IG_USERNAME, config.IG_PASSWORD)
 
@@ -12,6 +15,7 @@ export async function init() {
 }
 
 export async function postImg(buffer, caption) {
+    console.log("Publishing")
     await ig.publish.photo({
         file: buffer,
         caption: caption
