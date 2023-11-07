@@ -1,6 +1,6 @@
 import { IgApiClient } from 'instagram-private-api';
 import config from './config.js'
-
+import * as Blynk from './blynk.js'
 
 let ig;
 
@@ -11,7 +11,9 @@ export async function init() {
     await ig.simulate.preLoginFlow()
     const loggedInUser = await ig.account.login(config.IG_USERNAME, config.IG_PASSWORD)
 
-    console.log("Logged in as ", loggedInUser.username)
+    process.nextTick(async () => await ig.simulate.postLoginFlow());
+
+    Blynk.writeConsole(`IG Logged in as ${loggedInUser.username}`)
 }
 
 export async function postImg(buffer, caption) {
