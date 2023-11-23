@@ -35,6 +35,7 @@ const messaging = admin.messaging()
 Blynk.writeConsole(`RYW Latest Ready at ${dtFormat.format(new Date())}`)
 
 const fetchAnnouncements = async () => {
+    console.log("RUNNING Announcements")
     let cacheTitles = JSON.parse(fs.readFileSync(announcementCachePath, "utf-8"))
     const announcements = await getAnnouncements()
 
@@ -77,11 +78,14 @@ const fetchAnnouncements = async () => {
 }
 
 const fetchBanners = async () => {
+    console.log("RUNNING Banners")
+
     let cacheTitles = JSON.parse(fs.readFileSync(bannerCachePath, "utf-8"))
     const banners = await getBanners()
 
     if (cacheTitles.length == 0) {
         cacheTitles = banners
+        fs.writeFileSync(bannerCachePath, JSON.stringify(cacheTitles))
     } else {
         const newBanners = []
 
@@ -115,18 +119,20 @@ const fetchBanners = async () => {
 async function mainLoop() {
     await fetchAnnouncements()
     await fetchBanners()
+    console.log("CHECKUP COMPLETED")
     Blynk.updateData("V0", dtFormat.format(new Date()))
 }
 
 cron.schedule("*/5 5-22 * * *", mainLoop)
 async function main() {
-    await IG.init()
+    try { await IG.init() } catch(e) { console.error(e) }
+    console.log("GOING")
     mainLoop()
 }
 
 setTimeout(() => {
     main()
-}, 5000);
+}, 1000);
 
 process.on("uncaughtException", (e) => { console.log(e) })
 process.on("unhandledRejection", (e) => { console.log(e) })

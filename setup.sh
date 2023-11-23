@@ -1,4 +1,4 @@
-sudo chmod a+rwx ./
+sudo chmod -R 755 /rywl-server/
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl gnupg
 sudo mkdir -p /etc/apt/keyrings
@@ -9,5 +9,5 @@ sudo apt-get update
 sudo apt-get install nodejs -y
 sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 npm i
-node setup.js
+sudo node setup.js
 sudo systemctl enable rywld.service
