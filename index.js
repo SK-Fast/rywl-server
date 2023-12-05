@@ -100,6 +100,10 @@ const fetchBanners = async () => {
 
         if (igEnabled == 1) {
             for (const newA of newBanners) {
+                if (cacheTitles.includes(newA)) {
+                    continue
+                }
+
                 const buf = await axios.get(newA, {
                     responseType: "arraybuffer"
                 })
@@ -127,7 +131,10 @@ cron.schedule("*/5 5-22 * * *", mainLoop)
 async function main() {
     try { await IG.init() } catch(e) { console.error(e) }
     console.log("GOING")
-    mainLoop()
+
+    setTimeout(() => {
+        mainLoop()
+    }, 4000);
 }
 
 setTimeout(() => {
